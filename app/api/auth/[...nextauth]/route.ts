@@ -22,11 +22,11 @@ export const authOptions: AuthOptions = {
     CredentialsProvider({
       name: "credentials",
       credentials: {
-        email: { label: "email", type: "text" },
+        email: { label: "email", type: "email" },
         password: { label: "password", type: "password" },
       },
       async authorize(credentials) {
-        if (credentials?.email || !credentials?.password) {
+        if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid Credentials");
         }
 
@@ -62,4 +62,4 @@ export const authOptions: AuthOptions = {
 
 const handler = NextAuth(authOptions);
 
-export {handler as GET, handler as POST}
+export { handler as GET, handler as POST };
