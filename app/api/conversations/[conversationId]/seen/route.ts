@@ -1,6 +1,6 @@
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import { NextResponse } from "next/server";
-import prisma from '@/app/lib/prismadb'
+import prisma from "@/app/lib/prismadb";
 
 interface IParams {
   conversationId?: string;
@@ -30,34 +30,33 @@ export async function POST(request: Request, { params }: { params: IParams }) {
     });
 
     if (!conversation) {
-        return new NextResponse('Invalid ID', { status: 400})
+      return new NextResponse("Invalid ID", { status: 400 });
     }
 
-    const lastMessage = conversation.messages[conversation.messages.length - 1]
+    const lastMessage = conversation.messages[conversation.messages.length - 1];
 
     if (!lastMessage) {
-        return NextResponse.json(conversation)
+      return NextResponse.json(conversation);
     }
 
     const updateMessage = await prisma.message.update({
-        where: {
-            id: lastMessage.id
+      where: {
+        id: lastMessage.id,
+      },
+      include: {
+        sender: true,
+        seen: true,
+      },
+      data: {
+        seen: {
+          connect: {
+            id: currentUser.id,
+          },
         },
-        include: {
-            sender: true,
-            seen: true
-        },
-        data: {
-            seen: {
-                connect: {
-                    id: currentUser.id
-                }
-            }
-        }
-    })
+      },
+    });
 
-    return NextResponse.json(updateMessage)
-
+    return NextResponse.json(updateMessage);
   } catch (error: any) {
     console.log(error, "ERROR_MESSAGES_SEEN");
     return new NextResponse("Internal Error", { status: 500 });
